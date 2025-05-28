@@ -82,21 +82,6 @@ The viscometer measures the time taken for a fixed volume (60 ml) of fluid to fl
 
 ---
 
-## Repository Structure
-```
-Saybolt_Viscometer_Project/
-├── Report/
-│ └── SAYBOLT Viscometer Project Report.pdf # Project report with methodology and results
-├── Software/
-│ └── viscosity_calculation_gui.py # Python GUI for viscosity calculation
-├── Gallery/ # Images of the project
-│ └── ... # Project photos and design images
-├── Codes/ # ESP32 Firmware code
-│ └── ... # Arduino/C++ code for ESP32
-├── ... # Other relevant files
-```
----
-
 ## Getting Started
 
 1.  Clone the repository to your local machine.
