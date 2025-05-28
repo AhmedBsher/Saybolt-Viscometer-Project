@@ -1,0 +1,297 @@
+
+clc;clear;
+
+% -------------------------------------------------------------------------
+% 1. Define Constants and Data
+% -------------------------------------------------------------------------
+
+% Saybolt Viscometer Constants (assumed to have negligible uncertainty)
+A = 0.244765622;
+B = 0.061530348;
+
+% Reference Viscosity Value for Water (only needed for water as per your request)
+ref_viscosity_water = 0.89; % cSt for water
+
+% Time measurements (seconds)
+% First 5 readings are for water (original data)
+time_water = [3.73; 4.28; 4.28; 3.75; 3.54]; 
+% Last 5 readings are for milk (original data)
+time_milk = [8.35; 8.03; 7.7; 7.28; 8.24];
+
+% -------------------------------------------------------------------------
+% 2. Common Functions for Uncertainty Calculation
+% -------------------------------------------------------------------------
+
+% Function to calculate viscosity from time
+calculate_viscosity = @(t) A * t - B ./ t;
+
+% Function to calculate sensitivity coefficient (dv/dt)
+calculate_dv_dt = @(t_avg) A + B / (t_avg^2);
+
+% --- START OF UNCERTAINTY ANALYSIS FOR WATER ---
+fprintf('--- Analysing Water Measurements ---\n');
+
+% Calculate Viscosity for Water Measurements
+viscosity_measured_water = calculate_viscosity(time_water);
+avg_viscosity_measured_water = mean(viscosity_measured_water);
+
+fprintf('Average Measured Viscosity for Water: %.4f cSt\n', avg_viscosity_measured_water);
+fprintf('Reference Viscosity for Water: %.2f cSt\n', ref_viscosity_water);
+
+% Calculate Standard Uncertainty of Time for Water
+n_water = length(time_water);
+std_dev_t_water = std(time_water);
+u_t_water = std_dev_t_water / sqrt(n_water); % Standard uncertainty of the mean time for water
+
+fprintf('Standard Uncertainty for Water Time (u_t_water): %.4f seconds\n', u_t_water);
+
+% Calculate Sensitivity Coefficient for Water (dv/dt)
+avg_time_water = mean(time_water);
+dv_dt_water = calculate_dv_dt(avg_time_water);
+
+fprintf('Sensitivity Coefficient (dv/dt) for Water at average time %.2f s: %.4f cSt/s\n', avg_time_water, dv_dt_water);
+
+% --- Assuming negligible uncertainty from temperature for Water ---
+u_v_temperature_water = 0; % Set to 0 if temperature effect is negligible
+fprintf('Uncertainty in Viscosity due to Temperature for Water (u_v_temperature_water): %.4f cSt (Assumed negligible)\n', u_v_temperature_water);
+
+% Calculate Combined Standard Uncertainty for Water
+uc_v_water = sqrt( (dv_dt_water * u_t_water)^2 + (u_v_temperature_water)^2 ); 
+
+fprintf('Combined Standard Uncertainty for Water (uc_v_water): %.4f cSt\n', uc_v_water);
+
+% Calculate Expanded Uncertainty for Water
+k_water = 2; % Coverage factor for 95% confidence
+U_water = k_water * uc_v_water;
+
+fprintf('Expanded Uncertainty for Water (U_water) at 95%% confidence (k=2): %.4f cSt\n', U_water);
+fprintf('Water Viscosity: %.4f +/- %.4f cSt (at 95%% confidence)\n\n', avg_viscosity_measured_water, U_water);
+
+% --- START OF UNCERTAINTY ANALYSIS FOR MILK ---
+fprintf('--- Analysing Milk Measurements ---\n');
+
+% Calculate Viscosity for Milk Measurements
+viscosity_measured_milk = calculate_viscosity(time_milk);
+avg_viscosity_measured_milk = mean(viscosity_measured_milk);
+
+fprintf('Average Measured Viscosity for Milk: %.4f cSt\n', avg_viscosity_measured_milk);
+% Removed: fprintf('Reference Viscosity for Milk: %.2f cSt\n', ref_viscosity_milk);
+% The above line is removed as you do not want to use a reference value for milk.
+
+% Calculate Standard Uncertainty of Time for Milk
+n_milk = length(time_milk);
+std_dev_t_milk = std(time_milk);
+u_t_milk = std_dev_t_milk / sqrt(n_milk); % Standard uncertainty of the mean time for milk
+
+fprintf('Standard Uncertainty for Milk Time (u_t_milk): %.4f seconds\n', u_t_milk);
+
+% Calculate Sensitivity Coefficient for Milk (dv/dt)
+avg_time_milk = mean(time_milk);
+dv_dt_milk = calculate_dv_dt(avg_time_milk);
+
+fprintf('Sensitivity Coefficient (dv/dt) for Milk at average time %.2f s: %.4f cSt/s\n', avg_time_milk, dv_dt_milk);
+
+% --- Assuming negligible uncertainty from temperature for Milk ---
+u_v_temperature_milk = 0; % Set to 0 if temperature effect is negligible
+fprintf('Uncertainty in Viscosity due to Temperature for Milk (u_v_temperature_milk): %.4f cSt (Assumed negligible)\n', u_v_temperature_milk);
+
+% Calculate Combined Standard Uncertainty for Milk
+uc_v_milk = sqrt( (dv_dt_milk * u_t_milk)^2 + (u_v_temperature_milk)^2 );
+
+fprintf('Combined Standard Uncertainty for Milk (uc_v_milk): %.4f cSt\n', uc_v_milk);
+
+% Calculate Expanded Uncertainty for Milk
+k_milk = 2; % Coverage factor for 95% confidence
+U_milk = k_milk * uc_v_milk;
+
+fprintf('Expanded Uncertainty for Milk (U_milk) at 95%% confidence (k=2): %.4f cSt\n', U_milk);
+fprintf('Milk Viscosity: %.4f +/- %.4f cSt (at 95%% confidence)\n', avg_viscosity_measured_milk, U_milk);
+
+% MATLAB Code for plotting Viscometer Equation with Water and Milk data points
+
+figure; % Create a new figure window
+
+% Define a range for 't' to plot the full curve of the viscometer equation
+% The min/max should encompass both water and milk time ranges
+% Using the original data from earlier in our conversation for min/max
+% time_water = [8.35; 8.03; 7.7; 7.28; 8.24];
+% time_milk = [3.73; 4.28; 4.28; 3.75; 3.54];
+min_overall_time = min([min(time_water), min(time_milk)]); % Smallest time across both
+max_overall_time = max([max(time_water), max(time_milk)]); % Largest time across both
+
+% Extend the range slightly for better visualization
+t_range = linspace(min_overall_time - 1, max_overall_time + 1, 100);
+
+% Calculate viscosity for the full curve using the A and B constants
+% (Ensure these A and B are the ones you want for water/milk if different from corn/sesame)
+% Assuming A = 0.244765622 and B = 0.061530348 as per previous water/milk context
+A_old = 0.244765622; 
+B_old = 0.061530348;
+v_calculated = A_old * t_range - B_old ./ t_range;
+
+% Plot the main viscometer equation curve
+plot(t_range, v_calculated, 'b-', 'LineWidth', 2, 'DisplayName', 'v = A*t - B/t');
+hold on; % Keep the plot active to add more elements
+
+% --- Plot average time for Water ---
+avg_t_water = mean(time_water); % Make sure time_water is defined
+avg_v_water = A_old * avg_t_water - B_old / avg_t_water;
+plot(avg_t_water, avg_v_water, 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r', 'DisplayName', 'Avg. Water Measurement');
+
+% --- Plot average time for Milk ---
+avg_t_milk = mean(time_milk); % Make sure time_milk is defined
+avg_v_milk = A_old * avg_t_milk - B_old / avg_t_milk;
+plot(avg_t_milk, avg_v_milk, 'gs', 'MarkerSize', 8, 'MarkerFaceColor', 'g', 'DisplayName', 'Avg. Milk Measurement');
+
+% Add a tangent line (optional, more advanced) - keeping it commented as before
+% This part would need average times for water/milk specifically.
+% slope_water = A_old + B_old / (avg_t_water^2); % dv/dt at water average
+% tangent_line_water = slope_water * (t_range - avg_t_water) + avg_v_water;
+% plot(t_range, tangent_line_water, 'r--', 'DisplayName', 'Tangent at Water Avg.');
+
+xlabel('Flow Time (seconds)');
+ylabel('Kinematic Viscosity (cSt)');
+title('Viscometer Equation: Viscosity vs. Flow Time (Water & Milk)');
+legend('show', 'Location', 'best');
+grid on;
+hold off; % Release the plot
+
+% MATLAB Code to Calculate Viscosity Measurement Uncertainty for Each Fluid Separately
+% Assuming temperature uncertainty contribution is negligible or not considered.
+
+
+% -------------------------------------------------------------------------
+% 1. Define Constants and Data
+% -------------------------------------------------------------------------
+fprintf('\n\n'); 
+% Saybolt Viscometer Constants (NEW VALUES - assumed to have negligible uncertainty)
+A = 1.297738228;
+B = -235.6160549;
+
+% Reference Viscosity Value for Corn Oil (as specified: 35 cSt)
+ref_viscosity_corn_oil = 35; % cSt for Corn Oil
+
+% Time measurements (seconds) from your provided images
+% Data for Corn Oil from image_0990da.png
+time_corn_oil = [13.95; 14.13; 18.94; 16.8; 17.34]; 
+
+% Data for Sesame Oil from image_0990b4.png
+time_sesame_oil = [20.5; 22.82; 21.06; 19.86; 19.25]; 
+
+% -------------------------------------------------------------------------
+% 2. Common Functions for Uncertainty Calculation
+% -------------------------------------------------------------------------
+
+% Function to calculate viscosity from time
+calculate_viscosity = @(t) A * t - B ./ t;
+
+% Function to calculate sensitivity coefficient (dv/dt)
+calculate_dv_dt = @(t_avg) A + B / (t_avg^2);
+
+% --- START OF UNCERTAINTY ANALYSIS FOR CORN OIL ---
+fprintf('--- Analysing Corn Oil Measurements ---\n');
+
+% Calculate Viscosity for Corn Oil Measurements
+viscosity_measured_corn_oil = calculate_viscosity(time_corn_oil);
+avg_viscosity_measured_corn_oil = mean(viscosity_measured_corn_oil);
+
+fprintf('Average Measured Viscosity for Corn Oil: %.4f cSt\n', avg_viscosity_measured_corn_oil);
+fprintf('Reference Viscosity for Corn Oil: %.2f cSt\n', ref_viscosity_corn_oil);
+
+% Calculate Standard Uncertainty of Time for Corn Oil
+n_corn_oil = length(time_corn_oil);
+std_dev_t_corn_oil = std(time_corn_oil);
+u_t_corn_oil = std_dev_t_corn_oil / sqrt(n_corn_oil); % Standard uncertainty of the mean time for corn oil
+
+fprintf('Standard Uncertainty for Corn Oil Time (u_t_corn_oil): %.4f seconds\n', u_t_corn_oil);
+
+% Calculate Sensitivity Coefficient for Corn Oil (dv/dt)
+avg_time_corn_oil = mean(time_corn_oil);
+dv_dt_corn_oil = calculate_dv_dt(avg_time_corn_oil);
+
+fprintf('Sensitivity Coefficient (dv/dt) for Corn Oil at average time %.2f s: %.4f cSt/s\n', avg_time_corn_oil, dv_dt_corn_oil);
+
+% --- Assuming negligible uncertainty from temperature for Corn Oil ---
+u_v_temperature_corn_oil = 0; % Set to 0 if temperature effect is negligible
+fprintf('Uncertainty in Viscosity due to Temperature for Corn Oil (u_v_temperature_corn_oil): %.4f cSt (Assumed negligible)\n', u_v_temperature_corn_oil);
+
+% Calculate Combined Standard Uncertainty for Corn Oil
+uc_v_corn_oil = sqrt( (dv_dt_corn_oil * u_t_corn_oil)^2 + (u_v_temperature_corn_oil)^2 ); 
+
+fprintf('Combined Standard Uncertainty for Corn Oil (uc_v_corn_oil): %.4f cSt\n', uc_v_corn_oil);
+
+% Calculate Expanded Uncertainty for Corn Oil
+k_corn_oil = 2; % Coverage factor for 95% confidence
+U_corn_oil = k_corn_oil * uc_v_corn_oil;
+
+fprintf('Expanded Uncertainty for Corn Oil (U_corn_oil) at 95%% confidence (k=2): %.4f cSt\n', U_corn_oil);
+fprintf('Corn Oil Viscosity: %.4f +/- %.4f cSt (at 95%% confidence)\n\n', avg_viscosity_measured_corn_oil, U_corn_oil);
+
+
+% --- START OF UNCERTAINTY ANALYSIS FOR SESAME OIL ---
+fprintf('--- Analysing Semsem Oil Measurements ---\n');
+
+% Calculate Viscosity for Sesame Oil Measurements
+viscosity_measured_sesame_oil = calculate_viscosity(time_sesame_oil);
+avg_viscosity_measured_sesame_oil = mean(viscosity_measured_sesame_oil);
+
+fprintf('Average Measured Viscosity for Semsem Oil: %.4f cSt\n', avg_viscosity_measured_sesame_oil);
+% Removed: Reference Viscosity for Sesame Oil as per your request
+
+% Calculate Standard Uncertainty of Time for Sesame Oil
+n_sesame_oil = length(time_sesame_oil);
+std_dev_t_sesame_oil = std(time_sesame_oil);
+u_t_sesame_oil = std_dev_t_sesame_oil / sqrt(n_sesame_oil); % Standard uncertainty of the mean time for sesame oil
+
+fprintf('Standard Uncertainty for Semsem Oil Time (u_t_Semsem_oil): %.4f seconds\n', u_t_sesame_oil);
+
+% Calculate Sensitivity Coefficient for Sesame Oil (dv/dt)
+avg_time_sesame_oil = mean(time_sesame_oil);
+dv_dt_sesame_oil = calculate_dv_dt(avg_time_sesame_oil);
+
+fprintf('Sensitivity Coefficient (dv/dt) for Semsem Oil at average time %.2f s: %.4f cSt/s\n', avg_time_sesame_oil, dv_dt_sesame_oil);
+
+% --- Assuming negligible uncertainty from temperature for Sesame Oil ---
+u_v_temperature_sesame_oil = 0; % Set to 0 if temperature effect is negligible
+fprintf('Uncertainty in Viscosity due to Temperature for Semsem Oil (u_v_temperature_sesame_oil): %.4f cSt (Assumed negligible)\n', u_v_temperature_sesame_oil);
+
+% Calculate Combined Standard Uncertainty for Sesame Oil
+uc_v_sesame_oil = sqrt( (dv_dt_sesame_oil * u_t_sesame_oil)^2 + (u_v_temperature_sesame_oil)^2 );
+
+fprintf('Combined Standard Uncertainty for Sesame Oil (uc_v_Semsem_oil): %.4f cSt\n', uc_v_sesame_oil);
+
+% Calculate Expanded Uncertainty for Sesame Oil
+k_sesame_oil = 2; % Coverage factor for 95% confidence
+U_sesame_oil = k_sesame_oil * uc_v_sesame_oil;
+
+fprintf('Expanded Uncertainty for Semsem Oil (U_Semsem_oil) at 95%% confidence (k=2): %.4f cSt\n', U_sesame_oil);
+fprintf('Semsem Oil Viscosity: %.4f +/- %.4f cSt (at 95%% confidence)\n', avg_viscosity_measured_sesame_oil, U_sesame_oil);
+
+figure;
+t_range = linspace(min([time_corn_oil; time_sesame_oil]) - 2, max([time_corn_oil; time_sesame_oil]) + 2, 100);
+v_calculated = A * t_range - B ./ t_range;
+
+plot(t_range, v_calculated, 'b-', 'LineWidth', 2, 'DisplayName', 'v = A*t - B/t');
+hold on;
+
+% Plot average time for Corn Oil
+avg_t_corn_oil = mean(time_corn_oil);
+avg_v_corn_oil = A * avg_t_corn_oil - B / avg_t_corn_oil;
+plot(avg_t_corn_oil, avg_v_corn_oil, 'ro', 'MarkerSize', 8, 'MarkerFaceColor', 'r', 'DisplayName', 'Avg. Corn Oil Measurement');
+
+% Plot average time for Sesame Oil
+avg_t_sesame_oil = mean(time_sesame_oil);
+avg_v_sesame_oil = A * avg_t_sesame_oil - B / avg_t_sesame_oil;
+plot(avg_t_sesame_oil, avg_v_sesame_oil, 'gs', 'MarkerSize', 8, 'MarkerFaceColor', 'g', 'DisplayName', 'Avg. Sesame Oil Measurement');
+
+% Add a tangent line (optional, more advanced)
+% slope_corn_oil = A + B / (avg_t_corn_oil^2); % dv/dt at corn oil average
+% tangent_line_corn_oil = slope_corn_oil * (t_range - avg_t_corn_oil) + avg_v_corn_oil;
+% plot(t_range, tangent_line_corn_oil, 'r--', 'DisplayName', 'Tangent at Corn Oil Avg.');
+
+xlabel('Flow Time (seconds)');
+ylabel('Kinematic Viscosity (cSt)');
+title('Viscometer Equation: Viscosity vs. Flow Time');
+legend('show', 'Location', 'best');
+grid on;
+hold off;
