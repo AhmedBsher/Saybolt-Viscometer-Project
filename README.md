@@ -80,6 +80,14 @@ The viscometer measures the time taken for a fixed volume (60 ml) of fluid to fl
     -   Temperature errors
 -   Calculated combined and expanded uncertainties to provide a confidence interval.
 
+<p align="center">
+  <img src="Codes/MATLAB/Uncertainty Analysis/f1.jpg" alt="Time vs. Temperature" width="600"/>
+</p>
+
+<p align="center">
+  <img src="Codes/MATLAB/Uncertainty Analysis/f2.jpg" alt="Time vs. Temperature" width="600"/>
+</p>
+
 ---
 
 ## Getting Started
