@@ -86,8 +86,8 @@ The viscometer measures the time taken for a fixed volume (60 ml) of fluid to fl
 
 1.  Clone the repository to your local machine.
 2.  Review the `SAYBOLT Viscometer Project Report.pdf` for detailed information.
-3.  Explore the `Software` folder for the Python GUI.
-4.  Check the `Codes` folder for the ESP32 firmware.
+3.  Explore the `Codes` folder for the Python GUI.
+4.  Check the `Software` folder for the ESP32 firmware.
 5.  Refer to the `Gallery` for project images.
 
 ### Running the Python GUI
@@ -113,3 +113,6 @@ ahmedbsher999@gmail.com<br>
 
 ---
 
+## License
+
+This project is licensed under the MIT License.
